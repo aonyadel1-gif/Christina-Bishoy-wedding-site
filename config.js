@@ -1,4 +1,5 @@
-﻿window.AVA_CONFIG = {
-  url: "https://ovudbwuhfzycnlhabqew.supabase.co",
-  key: "sb_publishable_0KLU4wZJLYr30g55StzvCw_-eK41_uH"
+// ضع هنا بيانات مشروع Supabase الخاص بك (انظر README.md)
+window.WC = {
+  url: "https://YOUR-PROJECT.supabase.co",
+  key: "YOUR-ANON-PUBLIC-KEY"
 };

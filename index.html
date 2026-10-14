@@ -466,21 +466,20 @@ document.addEventListener('visibilitychange',function(){var a=$('song');if(docum
 // dock: palette / zaghrouta
 $('share').onclick=function(){var u=location.href.split('?')[0];if(navigator.share)navigator.share({title:'Bishoy & Christina',url:u}).catch(function(){});else if(navigator.clipboard)navigator.clipboard.writeText(u).then(function(){$('share').textContent='Link copied ✓'}).catch(function(){})};
 // guestbook: shared Supabase backend when configured, otherwise local preview
-var WC=window.WC||{url:'',key:''},REMOTE=!!(WC.url&&WC.key),local=[],last=0;
+var WC=window.WC||{sheet:''},REMOTE=!!WC.sheet,local=[],last=0;
 function ago(t){var m=Math.floor((Date.now()-t)/60000);if(m<1)return 'الآن';if(m<60)return 'منذ '+m+' د';var h=Math.floor(m/60);if(h<24)return 'منذ '+h+' ساعة';return new Date(t).toLocaleDateString('ar-EG',{day:'numeric',month:'long'})}
 function render(list){var w=$('wall');w.textContent='';$('cnt').textContent=list.length;
  var all=[{name:'العروسين ❤️',text:'يسعدنا دعوتكم لمشاركتنا فرحتنا يوم 1 نوفمبر، وننتظر كلماتكم الحلوة وصلواتكم لنا.',t:0,pin:1}].concat(list.slice(0,60));
  all.forEach(function(x){var d=document.createElement('div'),av=document.createElement('span'),bx=document.createElement('div'),b=document.createElement('b'),p=document.createElement('p'),m=document.createElement('small');d.className='msg'+(x.pin?' pin':'');av.className='av';av.textContent=x.pin?'✝':Array.from(x.name)[0];if(!x.pin)av.style.background='color-mix(in srgb,var(--gold) '+(18+x.name.charCodeAt(0)%32)+'%,var(--bg2))';bx.className='mb';b.textContent=x.name;p.textContent=x.text;m.textContent=x.pin?'دعوة من العروسين':ago(x.t);bx.append(b,p,m);d.append(av,bx);w.appendChild(d)})}
-function HD(){return{apikey:WC.key,Authorization:'Bearer '+WC.key,'Content-Type':'application/json'}}
 function loadW(){if(!REMOTE){render(local);return}
- fetch(WC.url+'/rest/v1/wishes?select=name,text,created_at&approved=eq.true&order=created_at.desc&limit=60',{headers:HD()}).then(function(r){return r.json()}).then(function(a){if(Array.isArray(a))render(a.map(function(x){return{name:x.name,text:x.text,t:new Date(x.created_at).getTime()}}))}).catch(function(){})}
+ fetch(WC.sheet+'?action=list&_='+Date.now()).then(function(r){return r.json()}).then(function(j){if(j&&j.ok&&Array.isArray(j.list))render(j.list)}).catch(function(){})}
 try{local=JSON.parse(localStorage.getItem('gb')||'[]')}catch(e){}
 if(REMOTE)$('gh').textContent='تظهر الرسائل بعد مراجعة العروسين ♡';
-loadW();if(REMOTE)setInterval(loadW,40000);
+loadW();if(REMOTE)setInterval(loadW,45000);
 $('gb').onsubmit=function(e){e.preventDefault();if(Date.now()-last<20000){alert('استنى لحظات قبل الرسالة الجاية 💛');return}
  var x={name:$('gn').value.trim().slice(0,40),text:$('gm').value.trim().slice(0,300)};if(!x.name||!x.text)return;last=Date.now();var b=$('gb').querySelector('button');
  function ok(t){$('gm').value='';b.textContent=t;setTimeout(function(){b.textContent='Send'},4500)}
- if(REMOTE){b.textContent='...';fetch(WC.url+'/rest/v1/wishes',{method:'POST',headers:Object.assign(HD(),{Prefer:'return=minimal'}),body:JSON.stringify(x)}).then(function(r){if(!r.ok)throw 0;ok('وصلت رسالتك ✓')}).catch(function(){last=0;b.textContent='حصلت مشكلة، حاول تاني';setTimeout(function(){b.textContent='Send'},3000)})}
+ if(REMOTE){b.textContent='...';fetch(WC.sheet+'?action=add&name='+encodeURIComponent(x.name)+'&text='+encodeURIComponent(x.text)).then(function(r){return r.json()}).then(function(j){if(!j||!j.ok)throw 0;ok('وصلت رسالتك ✓')}).catch(function(){last=0;b.textContent='حصلت مشكلة، حاول تاني';setTimeout(function(){b.textContent='Send'},3000)})}
  else{x.t=Date.now();local.unshift(x);try{localStorage.setItem('gb',JSON.stringify(local.slice(0,30)))}catch(e){}render(local);ok('Sent ✓')}};
 
 // timeline thread

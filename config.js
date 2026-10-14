@@ -1,5 +1,4 @@
-// ضع هنا بيانات مشروع Supabase الخاص بك (انظر README.md)
-window.WC = {
-  url: "https://YOUR-PROJECT.supabase.co",
-  key: "YOUR-ANON-PUBLIC-KEY"
+﻿window.WC = {
+  url: "https://fkatsbqfztqpkclzrbti.supabase.co",
+  key: "sb_publishable_J7YsY6xCuLvIcd4kYmZdeg_OZL74_t_"
 };
